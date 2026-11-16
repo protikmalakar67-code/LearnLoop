@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2457d6"><title>LearnLoop</title>
+<style>
+:root{--bg:#f4f7ff;--card:#fff;--ink:#17233d;--muted:#68758d;--blue:#2457d6;--line:#e2e8f4;--green:#16845b;--red:#c34343}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:linear-gradient(135deg,#1d4ed8,#5836b8);color:white;padding:22px 18px 20px;border-radius:0 0 24px 24px}
+.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:23px;font-weight:800}.sub{opacity:.88;font-size:13px;margin-top:4px}
+button,select,input,textarea{font:inherit}button{border:0;border-radius:12px;padding:11px 14px;background:var(--blue);color:white;font-weight:650;cursor:pointer}
+button.secondary{background:#eaf0ff;color:#2149b0}button.danger{background:#fff0f0;color:#a62f2f}button.small{padding:7px 10px;font-size:12px}
+.wrap{max-width:760px;margin:auto;padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:-2px}
+.stat,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 3px 12px #1e3a8a0a}
+.stat b{display:block;font-size:22px;color:var(--blue)}.stat span{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:7px;overflow:auto;padding:13px 0}nav button{white-space:nowrap;background:#e7edfb;color:#43516e}nav button.active{background:var(--blue);color:white}
+h2{font-size:18px;margin:5px 0 12px}h3{font-size:15px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}
+input,textarea,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);margin:5px 0 9px;outline-color:var(--blue)}
+textarea{min-height:85px;resize:vertical}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+.pill{font-size:11px;padding:4px 8px;border-radius:20px;background:#eaf0ff;color:#244bb3;display:inline-block}
+.progress{height:8px;background:#e9eef8;border-radius:20px;overflow:hidden;margin:8px 0}.progress i{display:block;height:100%;background:#20a477}
+.hidden{display:none!important}.timer{font-size:42px;font-weight:800;text-align:center;color:var(--blue);padding:12px}.rolebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.empty{padding:18px;text-align:center;color:var(--muted)}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:22px}
+@media(min-width:600px){.wrap{padding:20px}.stats{gap:14px}}
+</style></head><body>
+<header><div class="top"><div><div class="brand">📘 LearnLoop</div><div class="sub" id="tagline">শেখো • মনে রাখো • এগিয়ে যাও</div></div><button class="small" id="langBtn" onclick="toggleLang()">EN</button></div></header>
+<div class="wrap">
+<div class="stats">
+ <div class="stat"><b id="statTopics">0</b><span data-bn="টপিক" data-en="Topics">টপিক</span></div>
+ <div class="stat"><b id="statDone">0</b><span data-bn="সম্পন্ন" data-en="Completed">সম্পন্ন</span></div>
+ <div class="stat"><b id="statDue">0</b><span data-bn="রিভিশন বাকি" data-en="Due revision">রিভিশন বাকি</span></div>
+</div>
+<nav id="nav">
+<button class="active" data-tab="home" onclick="tab('home')" data-bn="হোম" data-en="Home">হোম</button>
+<button data-tab="topics" onclick="tab('topics')" data-bn="আমার পড়া" data-en="My study">আমার পড়া</button>
+<button data-tab="revision" onclick="tab('revision')" data-bn="রিভিশন" data-en="Revision">রিভিশন</button>
+<button data-tab="teach" onclick="tab('teach')" data-bn="Teach Back" data-en="Teach Back">Teach Back</button>
+<button data-tab="mistakes" onclick="tab('mistakes')" data-bn="ভুলের খাতা" data-en="Mistakes">ভুলের খাতা</button>
+<button data-tab="todo" onclick="tab('todo')" data-bn="পড়ার To‑Do" data-en="Study To‑Do">পড়ার To‑Do</button><button data-tab="usage" onclick="tab('usage')" data-bn="ব্যবহারের সময়" data-en="Usage time">ব্যবহারের সময়</button><button data-tab="report" onclick="tab('report')" data-bn="রিপোর্ট" data-en="Report">রিপোর্ট</button>
+<button data-tab="timer" onclick="tab('timer')" data-bn="টাইমার" data-en="Timer">টাইমার</button>
+<button data-tab="groups" onclick="tab('groups')" data-bn="গ্রুপ স্টাডি" data-en="Group study">গ্রুপ স্টাডি</button>
+<button data-tab="ai" onclick="tab('ai')" data-bn="AI সহায়ক" data-en="AI helper">AI সহায়ক</button>
+<button data-tab="admin" onclick="tab('admin')" data-bn="অ্যাডমিন" data-en="Admin">অ্যাডমিন</button>
+</nav>
+<section id="home" class="page">
+ <div class="card"><h2 data-bn="আজকের লক্ষ্য" data-en="Today's goal">আজকের লক্ষ্য</h2><div class="row"><input id="goalInput" type="number" min="1" max="20" placeholder="যেমন ৩টি টপিক"><button onclick="saveGoal()" data-bn="সেভ" data-en="Save">সেভ</button></div><div class="progress"><i id="goalBar" style="width:0%"></i></div><div class="muted" id="goalText"></div></div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="আজ কী করবে?" data-en="Today's plan">আজ কী করবে?</h2><div id="homePlan" class="muted"></div><div class="actions"><button onclick="tab('topics')" data-bn="+ নতুন টপিক" data-en="+ New topic">+ নতুন টপিক</button><button class="secondary" onclick="tab('revision')" data-bn="রিভিশন দেখো" data-en="Review now">রিভিশন দেখো</button></div></div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="শেখার ছোট্ট নিয়ম" data-en="A simple learning loop">শেখার ছোট্ট নিয়ম</h2><p class="muted" data-bn="১) পড়ো → ২) বই বন্ধ করে নিজের ভাষায় বোঝাও → ৩) ভুল লিখে রাখো → ৪) পরে আবার রিভিশন করো।" data-en="1) Study → 2) Explain from memory → 3) Log mistakes → 4) Revise later.">১) পড়ো → ২) বই বন্ধ করে নিজের ভাষায় বোঝাও → ৩) ভুল লিখে রাখো → ৪) পরে আবার রিভিশন করো।</p></div>
+</section>
+<section id="topics" class="page hidden">
+ <div class="card"><h2 data-bn="নতুন বিষয় / অধ্যায়" data-en="Add subject / chapter">নতুন বিষয় / অধ্যায়</h2>
+ <input id="subject" placeholder="বিষয় (যেমন Biology / গণিত)"><input id="topicName" placeholder="অধ্যায় বা টপিকের নাম">
+ <textarea id="notes" placeholder="ছোট নোট (ঐচ্ছিক)"></textarea><button onclick="addTopic()" data-bn="টপিক যোগ করো" data-en="Add topic">টপিক যোগ করো</button></div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="আমার টপিকগুলো" data-en="My topics">আমার টপিকগুলো</h2><div id="topicList"></div></div>
+</section>
+<section id="revision" class="page hidden"><div class="card"><h2 data-bn="আজকের রিভিশন" data-en="Revision queue">আজকের রিভিশন</h2><p class="muted" data-bn="একটি টপিক পড়া শেষ করলে সেটি এখানে নির্ধারিত বিরতিতে ফিরে আসবে।" data-en="Completed topics return here at spaced intervals.">একটি টপিক পড়া শেষ করলে সেটি এখানে নির্ধারিত বিরতিতে ফিরে আসবে।</p><div id="revisionList"></div></div></section>
+<section id="teach" class="page hidden"><div class="card"><h2>Teach Back — <span data-bn="নিজের ভাষায় বোঝাও" data-en="Explain in your own words">নিজের ভাষায় বোঝাও</span></h2><select id="teachTopic"></select><textarea id="teachText" placeholder="বই না দেখে বিষয়টি নিজের ভাষায় লেখো..."></textarea><button onclick="saveTeach()" data-bn="সংরক্ষণ" data-en="Save explanation">সংরক্ষণ</button><div id="teachList" style="margin-top:12px"></div></div></section>
+<section id="mistakes" class="page hidden"><div class="card"><h2 data-bn="ভুলের খাতা" data-en="Mistake book">ভুলের খাতা</h2><input id="mistakeTitle" placeholder="কোন প্রশ্ন/বিষয়ে ভুল হয়েছে?"><textarea id="mistakeFix" placeholder="সঠিক উত্তর / কেন ভুল হলো?"></textarea><button onclick="addMistake()" data-bn="ভুল যোগ করো" data-en="Add mistake">ভুল যোগ করো</button><div id="mistakeList" style="margin-top:12px"></div></div></section>
+
+<section id="todo" class="page hidden">
+ <div class="card">
+  <h2 data-bn="পড়ার কাজ নির্ধারণ" data-en="Schedule a study task">পড়ার কাজ নির্ধারণ</h2>
+  <input id="todoTitle" placeholder="কোন বিষয় / অধ্যায় পড়বে?">
+  <div class="row"><div><label class="muted">শুরু করার সময়</label><input id="todoStart" type="datetime-local"></div><div><label class="muted">শেষ করার সময়</label><input id="todoDue" type="datetime-local"></div></div>
+  <textarea id="todoNote" placeholder="কী কী শেষ করবে? (ঐচ্ছিক)"></textarea>
+  <button onclick="addTodo()" data-bn="তালিকায় যোগ করো" data-en="Add to list">তালিকায় যোগ করো</button>
+ </div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="যে কাজগুলো বাকি" data-en="Pending tasks">যে কাজগুলো বাকি</h2><div id="todoPending"></div></div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="সম্পন্ন কাজের তালিকা" data-en="Completed tasks">সম্পন্ন কাজের তালিকা</h2><div id="todoCompleted"></div></div>
+</section>
+<section id="usage" class="page hidden">
+ <div class="card">
+  <h2 data-bn="LearnLoop ব্যবহারের সময়" data-en="LearnLoop usage time">LearnLoop ব্যবহারের সময়</h2>
+  <div class="stat"><b id="usageToday">0 মিনিট</b><span data-bn="আজ এই অ্যাপে সক্রিয় সময়" data-en="Active time in this app today">আজ এই অ্যাপে সক্রিয় সময়</span></div>
+  <p class="muted">শুধু LearnLoop খোলা ও দৃশ্যমান থাকলে সময় গণনা হবে।</p>
+  <button class="secondary" onclick="renderUsage()">হালনাগাদ</button>
+ </div>
+ <div class="card" style="margin-top:12px"><h2 data-bn="গত ৭ দিনের হিসাব" data-en="Last 7 days">গত ৭ দিনের হিসাব</h2><div id="usageHistory"></div></div>
+ <p class="muted" data-bn="এটি শুধু LearnLoop-এর ভেতরের সময়। ফোনের অন্য অ্যাপ ব্যবহারের সময় এখানে দেখা যায় না।" data-en="This tracks LearnLoop only, not other apps on your phone.">এটি শুধু LearnLoop-এর ভেতরের সময়। ফোনের অন্য অ্যাপ ব্যবহারের সময় এখানে দেখা যায় না।</p>
+</section>
+<section id="report" class="page hidden"><div class="card"><h2 data-bn="তোমার অগ্রগতি" data-en="Your progress">তোমার অগ্রগতি</h2><div id="reportBody"></div><div class="actions"><button class="secondary" onclick="exportData()" data-bn="ডেটা ব্যাকআপ" data-en="Export backup">ডেটা ব্যাকআপ</button><button class="secondary" onclick="document.getElementById('importFile').click()" data-bn="ব্যাকআপ ফিরিয়ে আনো" data-en="Import backup">ব্যাকআপ ফিরিয়ে আনো</button><input id="importFile" type="file" accept="application/json" class="hidden" onchange="importData(event)"></div><button class="danger small" style="margin-top:12px" onclick="clearAll()" data-bn="সব ডেটা মুছুন" data-en="Delete all data">সব ডেটা মুছুন</button></div></section>
+
+<section id="timer" class="page hidden"><div class="card">
+<h2 data-bn="স্টাডি টাইমার" data-en="Study timer">স্টাডি টাইমার</h2>
+<p class="muted" data-bn="বিষয় বেছে নিয়ে টাইমার চালু করো।" data-en="Choose a topic and start tracking study time.">বিষয় বেছে নিয়ে টাইমার চালু করো।</p>
+<select id="timerTopic"></select><div class="timer" id="timerDisplay">25:00</div>
+<div class="row"><button onclick="startTimer()" data-bn="শুরু" data-en="Start">শুরু</button><button class="secondary" onclick="pauseTimer()" data-bn="বিরতি" data-en="Pause">বিরতি</button><button class="secondary" onclick="resetTimer()" data-bn="রিসেট" data-en="Reset">রিসেট</button></div>
+<div class="muted" id="timerStatus" style="text-align:center;margin-top:8px"></div>
+<div class="row"><input id="timerMinutes" type="number" min="1" max="180" value="25"><button class="secondary" onclick="setTimerLength()" data-bn="সময় সেট" data-en="Set minutes">সময় সেট</button></div>
+</div><div class="card" style="margin-top:12px"><h2 data-bn="বিষয়ভিত্তিক পড়ার সময়" data-en="Study time by subject">বিষয়ভিত্তিক পড়ার সময়</h2><div id="timeBySubject"></div></div></section>
+<section id="groups" class="page hidden"><div class="card"><h2 data-bn="গ্রুপ স্টাডি" data-en="Group study">গ্রুপ স্টাডি</h2>
+<p class="muted" data-bn="এখন একই ডিভাইসে গ্রুপ ও কাজের তালিকা রাখা যাবে; অনলাইন সদস্য-সিঙ্ক নেই।" data-en="Groups and tasks are stored on this device; online member sync is not connected.">এখন একই ডিভাইসে গ্রুপ ও কাজের তালিকা রাখা যাবে; অনলাইন সদস্য-সিঙ্ক নেই।</p>
+<input id="groupName" placeholder="গ্রুপের নাম / Group name"><input id="groupGoal" placeholder="গ্রুপের লক্ষ্য / Group goal"><button onclick="addGroup()" data-bn="গ্রুপ তৈরি" data-en="Create group">গ্রুপ তৈরি</button><div id="groupList" style="margin-top:12px"></div></div></section>
+<section id="ai" class="page hidden"><div class="card"><h2>AI Study Helper</h2>
+<p class="muted" data-bn="এটি অফলাইন স্টাডি সহায়ক। প্রকৃত AI উত্তর পেতে অনলাইন AI সংযোগ লাগবে।" data-en="Offline study helper. Real AI answers require an online AI connection.">এটি অফলাইন স্টাডি সহায়ক। প্রকৃত AI উত্তর পেতে অনলাইন AI সংযোগ লাগবে।</p>
+<select id="aiTopic"></select><textarea id="aiPrompt" placeholder="কী বিষয়ে সাহায্য দরকার? / What do you need help with?"></textarea>
+<div class="actions"><button onclick="makeStudyPlan()" data-bn="পড়ার রুটিন" data-en="Study plan">পড়ার রুটিন</button><button class="secondary" onclick="makeQuiz()" data-bn="কুইজ" data-en="Quiz">কুইজ</button><button class="secondary" onclick="makeExplain()" data-bn="বোঝার কৌশল" data-en="Explain method">বোঝার কৌশল</button></div><div id="aiOutput" class="item" style="margin-top:10px"></div></div></section>
+<section id="admin" class="page hidden"><div class="card"><h2>Role & Dashboard</h2><div class="rolebar"><label data-bn="ব্যবহারকারীর ধরন" data-en="User role">ব্যবহারকারীর ধরন</label><select id="roleSelect" onchange="changeRole()"><option value="student">Normal Student</option><option value="admin">Admin</option></select></div><div id="roleNotice" class="muted"></div><div id="roleDashboard" style="margin-top:12px"></div><p class="muted">নোট: এটি স্থানীয় ডেমো রোল; নিরাপদ অ্যাডমিন লগইন ও বহু-ব্যবহারকারীর জন্য সার্ভার লাগবে।</p></div></section>
+<footer>LearnLoop • Your learning data stays on this device</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let data=JSON.parse(localStorage.getItem('learnloop-v1')||'{"topics":[],"mistakes":[],"teach":[],"goal":3,"sessions":0,"todos":[],"usage":{},"lang":"bn","studyMinutes":{},"groups":[],"role":"student"}');
+data.studyMinutes=data.studyMinutes||{};data.groups=data.groups||[];data.role=data.role||'student';
+let current='home',timerSeconds=1500,timerInterval=null,timerRunning=false,timerStartedAt=null,activeTimerTopic=null;
+function save(){localStorage.setItem('learnloop-v1',JSON.stringify(data));render()}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function today(){return new Date().toISOString().slice(0,10)}
+function due(t){return !t.nextReview||t.nextReview<=today()}
+function toggleLang(){data.lang=data.lang==='bn'?'en':'bn';save()}
+function tr(bn,en){return data.lang==='bn'?bn:en}
+function applyLang(){document.documentElement.lang=data.lang;$('langBtn').textContent=data.lang==='bn'?'EN':'বাংলা';document.querySelectorAll('[data-bn]').forEach(el=>el.textContent=el.dataset[data.lang])}
+function tab(name){current=name;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('hidden',x.id!==name));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));render()}
+function addTopic(){let s=$('subject').value.trim(),n=$('topicName').value.trim();if(!s||!n){alert(tr('বিষয় ও টপিকের নাম লিখুন','Enter a subject and topic'));return}data.topics.push({id:uid(),subject:s,name:n,notes:$('notes').value.trim(),done:false,interval:0,nextReview:null,created:today()});$('subject').value='';$('topicName').value='';$('notes').value='';save()}
+function finishTopic(id){let t=data.topics.find(x=>x.id===id);if(!t)return;t.done=true;t.interval=1;t.nextReview=addDays(1);data.sessions++;save()}
+function addDays(n){let d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function review(id){let t=data.topics.find(x=>x.id===id);if(!t)return;t.done=true;t.interval=t.interval===0?1:Math.min(t.interval*2,30);t.nextReview=addDays(t.interval);data.sessions++;save()}
+function resetTopic(id){let t=data.topics.find(x=>x.id===id);if(t){t.done=false;t.interval=0;t.nextReview=null;save()}}
+function deleteTopic(id){if(confirm(tr('এই টপিক মুছবেন?','Delete this topic?'))){data.topics=data.topics.filter(x=>x.id!==id);save()}}
+function addMistake(){let title=$('mistakeTitle').value.trim();if(!title)return;data.mistakes.unshift({id:uid(),title,fix:$('mistakeFix').value.trim(),date:today(),done:false});$('mistakeTitle').value='';$('mistakeFix').value='';save()}
+function resolveMistake(id){let m=data.mistakes.find(x=>x.id===id);if(m)m.done=!m.done;save()}
+function deleteMistake(id){data.mistakes=data.mistakes.filter(x=>x.id!==id);save()}
+function saveTeach(){let id=$('teachTopic').value,text=$('teachText').value.trim();if(!id||!text){alert(tr('টপিক বেছে নিয়ে ব্যাখ্যা লিখুন','Choose a topic and write an explanation'));return}data.teach.unshift({id:uid(),topicId:id,text,date:today()});$('teachText').value='';save()}
+function saveGoal(){data.goal=Math.max(1,Math.min(20,Number($('goalInput').value)||3));save()}
+function topicName(id){return data.topics.find(t=>t.id===id)?.name||tr('মুছে ফেলা টপিক','Deleted topic')}
+
+function addTodo(){
+ let title=$('todoTitle').value.trim(),start=$('todoStart').value,dueAt=$('todoDue').value;
+ if(!title||!dueAt){alert(tr('কাজের নাম ও শেষ করার সময় দিন','Enter a task and due time'));return}
+ if(start&&new Date(start)>new Date(dueAt)){alert(tr('শেষের সময় শুরুর সময়ের পরে হতে হবে','Due time must be after start time'));return}
+ data.todos=data.todos||[];
+ data.todos.unshift({id:uid(),title,start,due:dueAt,note:$('todoNote').value.trim(),done:false,created:new Date().toISOString()});
+ $('todoTitle').value='';$('todoStart').value='';$('todoDue').value='';$('todoNote').value='';save();
+}
+function completeTodo(id){let t=(data.todos||[]).find(x=>x.id===id);if(t){t.done=true;t.completedAt=new Date().toISOString();save()}}
+function reopenTodo(id){let t=(data.todos||[]).find(x=>x.id===id);if(t){t.done=false;t.completedAt=null;save()}}
+function deleteTodo(id){if(confirm(tr('এই কাজটি মুছবেন?','Delete this task?'))){data.todos=(data.todos||[]).filter(x=>x.id!==id);save()}}
+function fmtDate(v){if(!v)return '—';let d=new Date(v);return isNaN(d)?v:d.toLocaleString(data.lang==='bn'?'bn-BD':'en-US',{dateStyle:'medium',timeStyle:'short'})}
+function addUsageSeconds(sec){if(sec<1)return;data.usage=data.usage||{};let k=today();data.usage[k]=(data.usage[k]||0)+sec;localStorage.setItem('learnloop-v1',JSON.stringify(data))}
+let usageLast=Date.now();
+function renderUsage(){
+ data.usage=data.usage||{};
+ let secs=data.usage[today()]||0;
+ $('usageToday').textContent=data.lang==='bn'?Math.floor(secs/60)+' মিনিট':Math.floor(secs/60)+' min';
+ let rows=[];
+ for(let i=0;i<7;i++){let d=new Date();d.setDate(d.getDate()-i);let k=d.toISOString().slice(0,10),s=data.usage[k]||0;rows.push(`<div class="item"><b>${k}</b><div class="muted">${Math.floor(s/60)} min ${s%60} sec</div></div>`)}
+ $('usageHistory').innerHTML=rows.join('');
+}
+setInterval(()=>{
+ let now=Date.now();
+ if(document.visibilityState==='visible'){
+  let sec=Math.floor((now-usageLast)/1000);
+  if(sec>0&&sec<90){addUsageSeconds(sec);if($('usage').classList.contains('hidden')===false)renderUsage()}
+ }
+ usageLast=now;
+},15000);
+document.addEventListener('visibilitychange',()=>{usageLast=Date.now()});
+function render(){
+ applyLang();renderExtras();$('statTopics').textContent=data.topics.length;$('statDone').textContent=data.topics.filter(t=>t.done).length;$('statDue').textContent=data.topics.filter(t=>t.done&&due(t)).length;
+ $('goalInput').value=data.goal;$('goalBar').style.width=Math.min(100,data.sessions% (data.goal+1)/data.goal*100)+'%';$('goalText').textContent=tr('মোট সম্পন্ন স্টাডি/রিভিশন সেশন: ','Total completed study/revision sessions: ')+data.sessions+' • '+tr('দৈনিক লক্ষ্য: ','Daily goal: ')+data.goal;
+ let dueItems=data.topics.filter(t=>t.done&&due(t));$('homePlan').textContent=tr('আজ রিভিশনের জন্য ','Due for revision today: ')+dueItems.length+tr('টি টপিক। নতুন পড়া যোগ করো এবং রিভিশন শেষ করো।',' topic(s). Add a new topic and complete your revision.');
+ $('topicList').innerHTML=data.topics.length?data.topics.map(t=>`<div class="item"><div class="row"><div><b>${esc(t.subject)} — ${esc(t.name)}</b><div class="muted">${esc(t.notes||'')}</div><span class="pill">${t.done?tr('পড়া হয়েছে','Studied'):tr('নতুন','New')}</span> ${t.nextReview?`<span class="muted">${tr('পরের রিভিশন: ','Next review: ')}${t.nextReview}</span>`:''}</div></div><div class="actions">${!t.done?`<button class="small" onclick="finishTopic('${t.id}')">${tr('পড়া শেষ','Mark studied')}</button>`:`<button class="small" onclick="resetTopic('${t.id}')">${tr('আবার শুরু','Reset')}</button>`}<button class="danger small" onclick="deleteTopic('${t.id}')">${tr('মুছুন','Delete')}</button></div></div>`).join(''):'<div class="empty">'+tr('এখনো কোনো টপিক যোগ করোনি।','No topics added yet.')+'</div>';
+ $('revisionList').innerHTML=dueItems.length?dueItems.map(t=>`<div class="item"><b>${esc(t.subject)} — ${esc(t.name)}</b><div class="muted">${tr('শেষ বিরতি: ','Last interval: ')}${t.interval||1} ${tr('দিন','days')}</div><button class="small" onclick="review('${t.id}')">${tr('রিভিশন শেষ','Complete revision')}</button></div>`).join(''):'<div class="empty">'+tr('আজ কোনো রিভিশন বাকি নেই।','No revision due today.')+'</div>';
+ $('teachTopic').innerHTML='<option value="">'+tr('টপিক নির্বাচন','Select a topic')+'</option>'+data.topics.map(t=>`<option value="${t.id}">${esc(t.subject)} — ${esc(t.name)}</option>`).join('');
+ $('teachList').innerHTML=data.teach.map(x=>`<div class="item"><b>${esc(topicName(x.topicId))}</b><div class="muted">${x.date}</div><div>${esc(x.text)}</div></div>`).join('');
+ $('mistakeList').innerHTML=data.mistakes.length?data.mistakes.map(m=>`<div class="item"><b>${esc(m.title)}</b><div>${esc(m.fix)}</div><div class="muted">${m.date} • ${m.done?tr('আয়ত্ত হয়েছে','Resolved'):tr('আবার দেখো','Review again')}</div><div class="actions"><button class="secondary small" onclick="resolveMistake('${m.id}')">${m.done?tr('আবার খোলা','Reopen'):tr('সমাধান হয়েছে','Mark resolved')}</button><button class="danger small" onclick="deleteMistake('${m.id}')">${tr('মুছুন','Delete')}</button></div></div>`).join(''):'<div class="empty">'+tr('এখনো কোনো ভুল যোগ করা হয়নি।','No mistakes logged yet.')+'</div>';
+ 
+ data.todos=data.todos||[];
+ let pending=data.todos.filter(t=>!t.done),completed=data.todos.filter(t=>t.done);
+ const todoCard=t=>`<div class="item"><b>${esc(t.title)}</b><div class="muted">শুরু: ${fmtDate(t.start)}<br>শেষ করার সময়: ${fmtDate(t.due)}</div>${t.note?`<div>${esc(t.note)}</div>`:''}<div class="actions"><button class="small" onclick="completeTodo('${t.id}')">সম্পন্ন</button><button class="danger small" onclick="deleteTodo('${t.id}')">মুছুন</button></div></div>`;
+ $('todoPending').innerHTML=pending.length?pending.map(todoCard).join():'<div class="empty">এখন কোনো কাজ বাকি নেই।</div>';
+ $('todoCompleted').innerHTML=completed.length?completed.map(t=>`<div class="item"><b>${esc(t.title)}</b><div class="muted">শেষ করেছে: ${fmtDate(t.completedAt)}</div><button class="secondary small" onclick="reopenTodo('${t.id}')">আবার বাকি করো</button></div>`).join():'<div class="empty">এখনো কোনো কাজ সম্পন্ন হয়নি।</div>';
+ renderUsage();
+$('reportBody').innerHTML=`<p>${tr('মোট টপিক','Total topics')}: <b>${data.topics.length}</b></p><p>${tr('সম্পন্ন টপিক','Studied topics')}: <b>${data.topics.filter(t=>t.done).length}</b></p><p>${tr('সমাধান করা ভুল','Resolved mistakes')}: <b>${data.mistakes.filter(m=>m.done).length}/${data.mistakes.length}</b></p><p>${tr('Teach Back নোট','Teach Back notes')}: <b>${data.teach.length}</b></p><p>${tr('মোট স্টাডি/রিভিশন সেশন','Total study/revision sessions')}: <b>${data.sessions}</b></p><h3>${tr('বিষয়ভিত্তিক অগ্রগতি','Progress by subject')}</h3>${[...new Set(data.topics.map(t=>t.subject))].map(s=>{let a=data.topics.filter(t=>t.subject===s),d=a.filter(t=>t.done).length,pct=Math.round(d/a.length*100);return `<div class="item"><b>${esc(s)}</b><div class="progress"><i style="width:${pct}%"></i></div><span class="muted">${d}/${a.length} ${tr('টপিক সম্পন্ন','topics completed')} (${pct}%)</span></div>`}).join('')}`;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='learnloop-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.topics||!x.mistakes)throw 0;data=x;save();alert(tr('ব্যাকআপ ফিরিয়ে আনা হয়েছে','Backup restored'))}catch(_){alert(tr('ফাইলটি সঠিক ব্যাকআপ নয়','Invalid backup file'))}};r.readAsText(f)}
+function clearAll(){if(confirm(tr('সব ডেটা স্থায়ীভাবে মুছে যাবে। নিশ্চিত?','All data will be permanently deleted. Continue?'))){data={topics:[],mistakes:[],teach:[],goal:3,sessions:0,lang:data.lang};save()}}
+
+function updateNewSelects(){const opts='<option value="">'+tr('বিষয় নির্বাচন','Select topic')+'</option>'+data.topics.map(t=>`<option value="${t.id}">${esc(t.subject)} — ${esc(t.name)}</option>`).join('');['timerTopic','aiTopic'].forEach(id=>{let e=$(id),v=e.value;e.innerHTML=opts;if(v)e.value=v});}
+function fmtTimer(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function setTimerLength(){if(timerRunning)pauseTimer();timerSeconds=Math.max(60,Math.min(10800,Number($('timerMinutes').value||25)*60));$('timerDisplay').textContent=fmtTimer(timerSeconds)}
+function startTimer(){if(timerRunning)return;activeTimerTopic=$('timerTopic').value;if(!activeTimerTopic){alert(tr('আগে একটি টপিক বেছে নাও','Choose a topic first'));return}timerRunning=true;timerStartedAt=Date.now();$('timerStatus').textContent=tr('টাইমার চলছে…','Timer running…');timerInterval=setInterval(()=>{let spent=Math.floor((Date.now()-timerStartedAt)/1000),left=Math.max(0,timerSeconds-spent);$('timerDisplay').textContent=fmtTimer(left);if(left===0)completeTimer()},500)}
+function pauseTimer(){if(!timerRunning)return;let spent=Math.max(0,Math.min(timerSeconds,Math.floor((Date.now()-timerStartedAt)/1000)));data.studyMinutes[activeTimerTopic]=(data.studyMinutes[activeTimerTopic]||0)+Math.floor(spent/60);timerSeconds-=spent;clearInterval(timerInterval);timerRunning=false;$('timerStatus').textContent=tr('বিরতি দেওয়া হয়েছে','Paused');save()}
+function completeTimer(){clearInterval(timerInterval);timerRunning=false;data.studyMinutes[activeTimerTopic]=(data.studyMinutes[activeTimerTopic]||0)+Math.max(1,Math.ceil(timerSeconds/60));data.sessions++;timerSeconds=0;$('timerDisplay').textContent='00:00';$('timerStatus').textContent=tr('সেশন সম্পন্ন!','Session completed!');save()}
+function resetTimer(){if(timerRunning)pauseTimer();timerSeconds=Math.max(60,Number($('timerMinutes').value||25)*60);$('timerDisplay').textContent=fmtTimer(timerSeconds);$('timerStatus').textContent=''}
+function addGroup(){let name=$('groupName').value.trim();if(!name)return;data.groups.push({id:uid(),name,goal:$('groupGoal').value.trim(),tasks:[]});$('groupName').value='';$('groupGoal').value='';save()}
+function addGroupTask(id){let task=prompt(tr('গ্রুপের কাজ লিখুন','Enter group task'));if(!task)return;let g=data.groups.find(x=>x.id===id);if(g){g.tasks.push({text:task,done:false});save()}}
+function toggleGroupTask(id,i){let g=data.groups.find(x=>x.id===id);if(g&&g.tasks[i])g.tasks[i].done=!g.tasks[i].done;save()}
+function deleteGroup(id){if(confirm(tr('গ্রুপটি মুছবেন?','Delete group?'))){data.groups=data.groups.filter(g=>g.id!==id);save()}}
+function changeRole(){data.role=$('roleSelect').value;save()}
+function makeStudyPlan(){let t=data.topics.find(x=>x.id===$('aiTopic').value);if(!t){alert(tr('একটি টপিক বেছে নাও','Select a topic'));return}$('aiOutput').innerHTML=`<b>${tr('৩০ মিনিটের পড়ার রুটিন','30-minute study plan')}: ${esc(t.name)}</b><ol><li>${tr('১০ মিনিট: নোট পড়ো','10 min: Read notes')}</li><li>${tr('১০ মিনিট: বই বন্ধ করে নিজের ভাষায় বোঝাও','10 min: Explain from memory')}</li><li>${tr('৫ মিনিট: নিজেকে প্রশ্ন করো','5 min: Self-test')}</li><li>${tr('৫ মিনিট: ভুল ঠিক করো','5 min: Review mistakes')}</li></ol>`}
+function makeQuiz(){let t=data.topics.find(x=>x.id===$('aiTopic').value);if(!t){alert(tr('একটি টপিক বেছে নাও','Select a topic'));return}$('aiOutput').innerHTML=`<b>${tr('নিজেকে যাচাই করো','Self-test')}: ${esc(t.name)}</b><ol><li>${tr('এই বিষয়ের মূল ধারণা কী?','What is the main idea?')}</li><li>${tr('একটি উদাহরণ দাও।','Give an example.')}</li><li>${tr('বই না দেখে তিনটি পয়েন্ট লেখো।','Write three points from memory.')}</li></ol>`}
+function makeExplain(){let t=data.topics.find(x=>x.id===$('aiTopic').value);if(!t){alert(tr('একটি টপিক বেছে নাও','Select a topic'));return}$('aiOutput').innerHTML=`<b>${tr('বোঝার কৌশল','Understanding method')}: ${esc(t.name)}</b><ol><li>${tr('ছোট অংশে ভাগ করো।','Break it into small parts.')}</li><li>${tr('সহজ উদাহরণ খুঁজে নাও।','Find a simple example.')}</li><li>${tr('বন্ধুকে বোঝানোর মতো করে বলো।','Explain it to a friend.')}</li><li>${tr('যা পারছ না, আবার পড়ো।','Revisit what you cannot explain.')}</li></ol>`}
+function renderExtras(){updateNewSelects();$('roleSelect').value=data.role;
+$('timeBySubject').innerHTML=data.topics.map(t=>`<div class="item"><b>${esc(t.subject)} — ${esc(t.name)}</b><div class="muted">${data.studyMinutes[t.id]||0} ${tr('মিনিট পড়া','minutes studied')}</div></div>`).join('')||'<div class="empty">'+tr('টাইমার দিয়ে পড়া শুরু করো','Start studying with the timer')+'</div>';
+$('groupList').innerHTML=data.groups.map(g=>`<div class="item"><b>${esc(g.name)}</b><div class="muted">${esc(g.goal)}</div>${g.tasks.map((x,i)=>`<div><label><input type="checkbox" style="width:auto" ${x.done?'checked':''} onchange="toggleGroupTask('${g.id}',${i})"> ${esc(x.text)}</label></div>`).join('')}<div class="actions"><button class="small" onclick="addGroupTask('${g.id}')">${tr('+ কাজ যোগ','+ Add task')}</button><button class="danger small" onclick="deleteGroup('${g.id}')">${tr('মুছুন','Delete')}</button></div></div>`).join('')||'<div class="empty">'+tr('এখনো গ্রুপ তৈরি হয়নি','No groups yet')+'</div>';
+$('roleNotice').textContent=data.role==='admin'?tr('অ্যাডমিন ডেমো মোড','Admin demo mode'):tr('সাধারণ শিক্ষার্থী মোড','Normal student mode');
+$('roleDashboard').innerHTML=data.role==='admin'?`<p>${tr('এই ডিভাইসের সারাংশ','This device summary')}: ${data.topics.length} ${tr('টপিক','topics')} • ${data.groups.length} ${tr('গ্রুপ','groups')} • ${data.mistakes.length} ${tr('ভুলের নোট','mistake notes')}</p><p class="muted">${tr('প্রকৃত ব্যবহারকারী পরিচালনার জন্য সার্ভার প্রয়োজন।','Real user management requires a backend.')}</p>`:`<p>${tr('তোমার পড়া, রিভিশন, টাইমার ও গ্রুপের কাজ এখানে পরিচালনা করো।','Manage study, revision, timer and group tasks here.')}</p>`;
+}
+
+render();
+</script></body></html>
